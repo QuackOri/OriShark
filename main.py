@@ -5,6 +5,7 @@ import ethernet as e
 import ip as i
 import transport as t
 import dns as d
+import type as TYPE
 
 data = f.read_file('syn_attack.pcap')
 
@@ -14,6 +15,7 @@ n_payload = g_payload
 
 index = 0
 while True:
+    # input()
     index += 1
     if len(n_payload) < 16:
         break
@@ -31,8 +33,9 @@ while True:
     print("########## Ethernet ##########")
     e_header, e_payload = e.parse(p_payload)
     print(e_header)
+
     ##### check ipv4
-    if not f.is_ipv4(e_header):
+    if not e_header.e_type == TYPE.IPV4:
         continue
     
     ##### parse ip header
@@ -41,10 +44,11 @@ while True:
     print(i_header)
 
     ##### check UDP
-    if f.which_protocol(i_header) == "UDP":
+    if i_header.protocol == TYPE.UDP:
         ##### parse udp header
         print("########## UDP Header ##########")
         u_header, u_payload = t.udp_parse(i_payload)
+        print(u_header)
 
         ##### only DNS Response
         if not u_header.src_port == 53:
@@ -56,7 +60,7 @@ while True:
         print(d_header)
         # f.print_answer_ip(d_header.answers)
 
-    elif f.which_protocol(i_header) == "TCP":
+    elif i_header.protocol == TYPE.TCP:
         ##### parse tcp header
         print("########## TCP Header ##########")
         t_header, t_payload = t.tcp_parse(i_payload)
