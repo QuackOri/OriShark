@@ -10,5 +10,5 @@ ARP = int('0x0806', 16)
 
 ##### Internet Layer #####
 ICMP = int('0x01', 16)
-TCP = int('0x08', 16)
+TCP = int('0x06', 16)
 UDP = int('0x11', 16)
