@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from struct import *
+import functions as f
 
 header_size = 1 + 1 + 2 + 2 + 2 + 1 + 1 + 2 + 4 + 4
 
@@ -27,18 +28,12 @@ def divide_version_and_headerL(v_and_headerL):
     header_length = binary[4:]
     return int(version, 2), int(header_length, 2)
 
-def build_ip_address(ip_address):
-    ip_address_list = []
-    for ip in ip_address:
-        ip_address_list.append(ip)
-    return '.'.join([str(ip) for ip in ip_address_list])
-
 def parse(data):
     header = data[:header_size]
     payload = data[header_size:]
     VandHS, svc, pl, iden, FandFO, ttl, protocol, head_chk, s_ip, d_ip = unpack('>BBHHHBBH4s4s', header)
     version, header_length = divide_version_and_headerL(VandHS)
-    s_ip = build_ip_address(s_ip)
-    d_ip = build_ip_address(d_ip)
+    s_ip = f.build_ip_address(s_ip)
+    d_ip = f.build_ip_address(d_ip)
 
     return IP(version, header_length, svc, pl, iden, FandFO, ttl, protocol, head_chk, s_ip, d_ip), payload

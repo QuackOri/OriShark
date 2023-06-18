@@ -2,9 +2,11 @@ import functions as f
 import pcap as p
 import packet as pkt
 import ethernet as e
+import arp as a
 import ip as i
-import transport as t
+import icmp as ic
 import dns as d
+import transport as t
 import type as TYPE
 import http as h
 import time
@@ -36,6 +38,13 @@ while True:
     e_header, e_payload = e.parse(p_payload)
     print(e_header)
 
+    ##### parse arp header
+    if e_header.e_type == TYPE.ARP:
+        print("########## ARP ##########")
+        a_header = a.parse(e_payload)
+        print(a_header)
+        continue
+
     ##### check ipv4
     if not e_header.e_type == TYPE.IPV4:
         continue
@@ -45,8 +54,15 @@ while True:
     i_header, i_payload = i.parse(e_payload)
     print(i_header)
 
+    ##### check ICMP
+    if i_header.protocol == TYPE.ICMP:
+        print("########## ICMP Header ##########")
+        ic_header, control_message = ic.parse(i_payload)
+        print(ic_header)
+        print("# CONTROL MESSAGE:", control_message)
+
     ##### check UDP
-    if i_header.protocol == TYPE.UDP:
+    elif i_header.protocol == TYPE.UDP:
         ##### parse udp header
         print("########## UDP Header ##########")
         u_header, u_payload = t.udp_parse(i_payload)
@@ -62,16 +78,17 @@ while True:
         print(d_header)
         # f.print_answer_ip(d_header.answers)
 
+    ##### check TCP
     elif i_header.protocol == TYPE.TCP:
         ##### parse tcp header
         print("########## TCP Header ##########")
         t_header, t_payload = t.tcp_parse(i_payload)
         print(t_header)
 
-
         # Convert bytes to string
         t_payload_str = t_payload.decode(errors='ignore')
 
+        ##### check HTTP
         if t_payload_str.startswith('GET ') or t_payload_str.startswith('POST ') or t_payload_str.startswith('HEAD ') or t_payload_str.startswith('PUT ') or t_payload_str.startswith('DELETE ') or t_payload_str.startswith('OPTIONS ') or t_payload_str.startswith('TRACE '):
             print("########## HTTP Request ##########")
             time.sleep(3)
