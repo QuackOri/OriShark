@@ -5,6 +5,7 @@ Layer들의 각 헤더를 class로 만들어 parse 하도록 구현하였습니�
 
 현재 읽을 수 있는 헤더:
 - TCP
+  - HTTP
 - UDP
   - DNS
 
