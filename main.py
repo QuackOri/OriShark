@@ -6,6 +6,8 @@ import ip as i
 import transport as t
 import dns as d
 import type as TYPE
+import http as h
+import time
 
 data = f.read_file('syn_attack.pcap')
 
@@ -65,3 +67,18 @@ while True:
         print("########## TCP Header ##########")
         t_header, t_payload = t.tcp_parse(i_payload)
         print(t_header)
+
+
+        # Convert bytes to string
+        t_payload_str = t_payload.decode(errors='ignore')
+
+        if t_payload_str.startswith('GET ') or t_payload_str.startswith('POST ') or t_payload_str.startswith('HEAD ') or t_payload_str.startswith('PUT ') or t_payload_str.startswith('DELETE ') or t_payload_str.startswith('OPTIONS ') or t_payload_str.startswith('TRACE '):
+            print("########## HTTP Request ##########")
+            time.sleep(3)
+            http_request = h.parse_http_request(t_payload_str)
+            print(http_request)
+
+        elif t_payload_str.startswith('HTTP/'):
+            print("########## HTTP Response ##########")
+            http_response = h.parse_http_response(t_payload_str)
+            print(http_response)
